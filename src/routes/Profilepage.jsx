@@ -19,7 +19,7 @@ function Profile(props){
 
     function loadUsersTweets(){
         const options = {headers:{Authorization:token}}
-        return fetch(`http://localhost:3100/api/users/${state._id}/tweets`,options)
+        return fetch(`https://twitter-clone-86ay.onrender.com/api/users/${state._id}/tweets`,options)
        .then(res => res.json())
        .then(json => {
             console.log(json);
