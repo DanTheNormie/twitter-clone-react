@@ -4,7 +4,22 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom";
 
 
-function Form(props){
+function ShowUsername(props){
+    if(!props.isLogin){
+        return(
+            <TextField id='username' defaultValue={props.value} label='Username' variant="outlined" required sx={{m:2}}></TextField>
+        )
+    }
+}
+
+function ShowError(props){
+    if(props.err_msg){
+        return <p className="text-red-500">{props.err_msg}</p>
+    }
+}
+
+
+function Auth(props){
     const navigate = useNavigate()
     const [isLogin,setIsLogin] = useState(props.isLogin)
     const [showPassword, setShowPassword] = useState(false);
@@ -12,15 +27,7 @@ function Form(props){
     const [err_msg, setErr_msg] = useState('')
     const [username_value, setUsername_value] = useState('')
 
-    const handleClickShowPassword = () => {
-        
-        setShowPassword((show) => !show); 
-        if(!isLogin){
-            const username_field = document.getElementById('username').value;
-            setUsername_value(username_field);
-        }
-        
-    };
+    const handleClickShowPassword = () => {setShowPassword((show) => !show);};
 
     const handleSubmit = (e)=>{
         e.preventDefault()
@@ -59,21 +66,7 @@ function Form(props){
             .catch((err)=>{console.log(err);});
         
     }
-
-    function ShowUsername(props){
-        if(!props.isLogin){
-            return(
-                <TextField id='username' defaultValue={props.value} label='Username' variant="outlined" required sx={{m:2}}></TextField>
-            )
-        }
-    }
-
-    function ShowError(props){
-        if(props.err_msg){
-            return <p className="text-red-500">{props.err_msg}</p>
-        }
-    }
-
+    
     function switchAuth(){
         setIsLogin(!isLogin)
         setErr_msg('')
@@ -115,4 +108,4 @@ function Form(props){
 }
 
 
-export default Form
+export default Auth

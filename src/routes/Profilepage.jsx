@@ -30,7 +30,7 @@ function Profile(props){
 
     useEffect(()=>{
         loadUsersTweets()
-    },firsttime)
+    },[firsttime])
 
     async function onEditSubmitClick(){
 
