@@ -8,14 +8,15 @@ import TweetBox from "../components/TweetBox";
 
 function Profile(props){
     const [showPassword, setShowPassword] = useState(false);
-    const [firsttime,setFirstTime] = useState(true)
     const handleClickShowPassword = () => setShowPassword((show) => !show);
     const [disabled,setDisabled] = useState(true)
     const [usernameHelper,setUsernameHelper] = useState('Username')
-    const [ageHelper,setAgeHelper] = useState('age')
+    const [ageHelper,setAgeHelper] = useState('Age')
     const {state} = useLocation()
     const token = localStorage.getItem('user_token')
     const [articlesList,setArticlesList] = useState([])
+
+    console.log(state);
 
     function loadUsersTweets(){
         const options = {headers:{Authorization:token}}
@@ -30,7 +31,7 @@ function Profile(props){
 
     useEffect(()=>{
         loadUsersTweets()
-    },[firsttime])
+    },[])
 
     async function onEditSubmitClick(){
 
@@ -42,6 +43,7 @@ function Profile(props){
             method:'PATCH'
         }
         options.body = JSON.stringify({
+            _id:state._id,
             username,
             age
         })
@@ -58,7 +60,7 @@ function Profile(props){
             <form className='flex flex-col items-center border w-fit p-8 m-4 rounded-xl bg-slate-200'>
                 <div className="flex w-full justify-between items-center mb-4">
                     <h1 className="text-3xl  font-bold">User Details</h1>
-                    <IconButton onClick={()=>{setDisabled(!disabled)}} className="ml-3"><EditIcon></EditIcon></IconButton>
+                    <IconButton disabled = {disabled} onClick={()=>{setDisabled(!disabled)}} className="ml-3"><EditIcon></EditIcon></IconButton>
                 </div>
                 
                 <TextField className="w-full" id='email' disabled label='Email' value={state.email} type="email" variant="outlined" sx={{m:2}}></TextField>
