@@ -33,7 +33,7 @@ function TweetBox(props){
         })
         setLoading(true)
         //console.log(options);
-        return fetch('http://localhost:3100/api/tweet/like', options)
+        return fetch('https://twitter-clone-86ay.onrender.com/api/tweet/like', options)
         .then((res)=>res.json())
         .then(data =>{
             if(data.success){
