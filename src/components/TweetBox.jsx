@@ -9,12 +9,13 @@ import Tooltip from '@mui/material/Tooltip';
 import ModeCommentOutlinedIcon from '@mui/icons-material/ModeCommentOutlined';
 import ShareIcon from '@mui/icons-material/Share';
 import LoadingButton from '@mui/lab/LoadingButton';
-const token = localStorage.getItem('user_token')
+
 
 
 function TweetBox(props){
     const navigate = useNavigate()
     const [loading,setLoading] = useState(false)
+    const token = localStorage.getItem('user_token')
     let _likeIcon = <FavoriteBorderIcon/>
     if(props.liked){_likeIcon = <FavoriteIcon/>}
     const [likeIcon, setLikeIcon] = useState(_likeIcon)
@@ -31,7 +32,8 @@ function TweetBox(props){
             uid:props.uid
         })
         setLoading(true)
-        return fetch('https://twitter-clone-86ay.onrender.com/api/tweet/like', options)
+        //console.log(options);
+        return fetch('http://localhost:3100/api/tweet/like', options)
         .then((res)=>res.json())
         .then(data =>{
             if(data.success){
@@ -42,7 +44,6 @@ function TweetBox(props){
                 }
             }
             setLoading(false)
-            
         })
         .catch((err)=>{
             console.log(err);

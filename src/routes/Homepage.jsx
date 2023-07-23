@@ -100,6 +100,8 @@ function Homepage(props){
                     }
                     return <TweetBox key={article._id} liked = {postLiked} user={article.author} by={article.author.username || ''} title={article.title} desc={article.desc} time={article.createdAt} _id={article._id} uid={state._id}></TweetBox>
                 })}
+
+                {!articlesList && <h1>.... * cricket noises * ....</h1>}
             </div>
             
         </div>
