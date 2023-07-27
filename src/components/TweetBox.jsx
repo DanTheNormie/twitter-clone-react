@@ -11,6 +11,7 @@ import ShareIcon from '@mui/icons-material/Share';
 import LoadingButton from '@mui/lab/LoadingButton';
 import CommentBox from "./CommentBox";
 import CreateComment from "./createComment";
+import {LOCAL_URL,PROD_URL} from '../../config'
 
 
 
@@ -67,7 +68,7 @@ function TweetBox(props){
             article_id:props._id
         })
         setCommentLoading(true)
-        fetch('http://localhost:3100/api/getTweetComments',options)
+        fetch(`${PROD_URL}/api/getTweetComments`,options)
             .then((res)=>res.json())
             .then(data=>{
                 console.log(data);

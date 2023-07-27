@@ -6,7 +6,7 @@ import MuiAlert from '@mui/material/Alert';
 import SendIcon from '@mui/icons-material/Send';
 import LoadingButton from '@mui/lab/LoadingButton';
 
-import {LOCAL_URL} from '../../config'
+import {LOCAL_URL,PROD_URL} from '../../config'
 
 function CreateComment(props){
     //const {username,_id} = props.currentUser
@@ -33,7 +33,7 @@ function CreateComment(props){
             by:props.uid
         })
 
-        fetch(`${LOCAL_URL}/api/addComment`,options)
+        fetch(`${PROD_URL}/api/addComment`,options)
         .then((res)=>res.json())
         .then((data)=>{
             setLoading(false)
