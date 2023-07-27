@@ -55,9 +55,8 @@ function Profile(props){
     }
 
     return(
-        <div >
-        <div className="border rounded flex flex-col justify-center">
-            <form className='flex flex-col items-center border w-fit p-8 m-4 rounded-xl bg-slate-200'>
+        <div className="flex flex-col justify-center m-4" >
+            <form className='flex flex-col justify-center items-center border w-full p-8 rounded-xl bg-slate-200'>
                 <div className="flex w-full justify-between items-center mb-4">
                     <h1 className="text-3xl  font-bold">User Details</h1>
                     <IconButton disabled = {disabled} onClick={()=>{setDisabled(!disabled)}} className="ml-3"><EditIcon></EditIcon></IconButton>
@@ -70,13 +69,29 @@ function Profile(props){
                 <Button variant="contained" onClick={onEditSubmitClick} disabled={disabled} sx={{m:4}}>Edit</Button>
             </form>
             
-        </div>
-        <p className="text-center font-bold text-5xl my-8">Tweets</p>
-        <div className="mt-4 border rounded">
-            {articlesList.map((article, idx)=>{
-                return <TweetBox user={article.author} by={article.author.username} title={article.title} desc={article.desc} time={article.createdAt}></TweetBox>
-            })}
-        </div>
+        
+            
+            <div className="mt-4 border rounded">
+                <p className="text-center font-bold text-5xl my-8">Tweets</p>
+                {articlesList.map((article, idx)=>{
+                    let postLiked = false
+                    if(article.likedBy.includes(state._id)){
+                        postLiked = true
+                    }
+                    return <TweetBox 
+                        liked={postLiked}
+                        user={article.author} 
+                        by={article.author.username} 
+                        title={article.title} 
+                        desc={article.desc} 
+                        time={article.createdAt} 
+                        _id = {article._id}
+                        uid={state._id} 
+                        currentUser={{username:'Daniel',createdAt:"2018-07-03"}}>
+                            
+                    </TweetBox>
+                })}
+            </div>
         </div>
     )
 }

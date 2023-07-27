@@ -32,7 +32,7 @@ function Homepage(props){
     let status_msg= useRef('')
     let alert_style = useRef('error')
 
-    const StatusCallback = (tweetStatusMessage, alertStyle)=>{
+    const statusCallback = (tweetStatusMessage, alertStyle)=>{
         status_msg.current = tweetStatusMessage
         alert_style.current = alertStyle
         console.log(status_msg, alert_style);
@@ -55,17 +55,13 @@ function Homepage(props){
                     navigate('/')
                 }
                 setIsLoading(false)
-                status_msg.current = json.message
-                alert_style.current='error'
-                setOpen(true)
+                statusCallback(json.message,'error')
             }
            
        })
        .catch((err=>{
             console.log(err);
-            status_msg.current = err.message || 'Backend is Down 🥲'
-            alert_style.current='error'
-            setOpen(true)
+            statusCallback(err.message || 'Backend is Down', 'error')
             setIsLoading(false)
         }))
 
@@ -90,7 +86,7 @@ function Homepage(props){
         </Snackbar>
         
         <div className="flex flex-col p-8 max-w-7xl">
-            <CreateTweet user={state} username={state.username} id={state._id} fetchTweets={fetchTweets} OnTweetSentcallback={StatusCallback}  />    
+            <CreateTweet user={state} username={state.username} id={state._id} fetchTweets={fetchTweets} OnTweetSentcallback={statusCallback}  />    
             <div className="mt-4 border rounded">
                 <Loading isLoading = {isLoading}/>
                 {articlesList.map((article, idx)=>{
@@ -98,7 +94,17 @@ function Homepage(props){
                     if(article.likedBy.includes(state._id)){
                         postLiked = true
                     }
-                    return <TweetBox key={article._id} liked = {postLiked} user={article.author} by={article.author.username || ''} title={article.title} desc={article.desc} time={article.createdAt} _id={article._id} uid={state._id}></TweetBox>
+                    return <TweetBox 
+                    key={article._id} 
+                    liked = {postLiked} 
+                    user={article.author} 
+                    by={article.author.username || ''} 
+                    title={article.title} 
+                    desc={article.desc} 
+                    time={article.createdAt} 
+                    _id={article._id} 
+                    uid={state._id} 
+                    currentUser={{username:state.username,_id:state._id}}></TweetBox>
                 })}
 
                 {!articlesList && <h1>.... * cricket noises * ....</h1>}

@@ -1,7 +1,7 @@
-import { Avatar, Button } from "@mui/material";
+import { Avatar, Button, Card, Collapse } from "@mui/material";
 import moment from 'moment'
 import { useNavigate, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Divider from '@mui/material/Divider';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
@@ -9,16 +9,22 @@ import Tooltip from '@mui/material/Tooltip';
 import ModeCommentOutlinedIcon from '@mui/icons-material/ModeCommentOutlined';
 import ShareIcon from '@mui/icons-material/Share';
 import LoadingButton from '@mui/lab/LoadingButton';
+import CommentBox from "./CommentBox";
+import CreateComment from "./createComment";
 
 
 
 function TweetBox(props){
     const navigate = useNavigate()
-    const [loading,setLoading] = useState(false)
+    const [likeLoading,setLikeLoading] = useState(false)
+    const [commentLoading,setCommentLoading] = useState(false)
     const token = localStorage.getItem('user_token')
     let _likeIcon = <FavoriteBorderIcon/>
     if(props.liked){_likeIcon = <FavoriteIcon/>}
     const [likeIcon, setLikeIcon] = useState(_likeIcon)
+    const [expanded, setExpanded] = useState(false)
+    let [comments,setComments] = useState([])
+    const [createCommentExpanded, setCreateCommentExpanded] = useState(false)
     
 
     async function setLike(){
@@ -31,7 +37,7 @@ function TweetBox(props){
             tweet_id:props._id,
             uid:props.uid
         })
-        setLoading(true)
+        setLikeLoading(true)
         //console.log(options);
         return fetch('https://twitter-clone-86ay.onrender.com/api/tweet/like', options)
         .then((res)=>res.json())
@@ -43,16 +49,54 @@ function TweetBox(props){
                     setLikeIcon(<FavoriteBorderIcon/>)
                 }
             }
-            setLoading(false)
+            setLikeLoading(false)
         })
         .catch((err)=>{
             console.log(err);
-            setLoading(false)
+            setLikeLoading(false)
         })
     }
 
+
+    const onCommentCallback = ()=>{
+        const options = {
+            headers:{'Authorization':`${token}`,"Content-type": "application/json; charset=UTF-8"},
+            method:'POST'
+        }
+        options.body = JSON.stringify({
+            article_id:props._id
+        })
+        setCommentLoading(true)
+        fetch('http://localhost:3100/api/getTweetComments',options)
+            .then((res)=>res.json())
+            .then(data=>{
+                console.log(data);
+                if(data.success){
+                    if(data.data.length>0) {setComments(data.data);}
+                    setExpanded(true)
+                }else{
+                }
+                setCommentLoading(false)
+            }).catch((err)=>{
+                console.log(err);
+                setCommentLoading(false)
+            })
+    }
+
+    function commentOnClickHandler(){
+        
+        if(expanded){
+            setExpanded(false)
+            setCreateCommentExpanded(false)
+        } 
+        else{
+            setCreateCommentExpanded(true)
+            onCommentCallback()
+        }
+    }
+
     return(
-        <div className="border p-4 rounded m-4">
+        <Card className="border p-4 rounded m-4">
             <div className="flex items-center justify-between ">
                 
                 <div className="flex items-center">
@@ -66,24 +110,42 @@ function TweetBox(props){
                 <p className="mt-2">{props.desc}</p>
             </div>
             <Divider className="!my-4" variant="middle"  />
-            <div className=" flex justify-center">
-                <LoadingButton className="max-[480px]:!text-[0px]" loading ={loading}
+            <div className=" flex justify-around">
+                <LoadingButton className="max-[480px]:!text-[0px]" loading ={likeLoading}
                     loadingPosition="start"
                     onClick={setLike}
                     startIcon={likeIcon}>
                         Like
                 </LoadingButton>
                 <Divider orientation="vertical" variant="middle" flexItem/>
-                <Tooltip title="Feature coming soon..." arrow>
-                    <Button variant="standard" className="max-[480px]:!text-[0px]" startIcon={<ModeCommentOutlinedIcon/>}>Comment</Button>
-                </Tooltip>
+                
+                <LoadingButton 
+                    className="max-[480px]:!text-[0px]" 
+                    loadingPosition="start"
+                    loading={commentLoading}
+                    startIcon={<ModeCommentOutlinedIcon/>} 
+                    onClick={commentOnClickHandler}>
+                        Comment
+                </LoadingButton>
+                
                 <Divider orientation="vertical" variant="middle" flexItem/>
                 <Tooltip title="Feature coming soon..." arrow>
                     <Button variant="standard" className="max-[480px]:!text-[0px]" startIcon={<ShareIcon/>}>Share</Button>
                 </Tooltip>
 
             </div>
-        </div>
+            <Collapse in={createCommentExpanded}>
+                <CreateComment currentUser={props.currentUser} uid = {props.uid} article_id={props._id} onCommentCallback = {onCommentCallback} />
+            </Collapse>
+
+            <Collapse in={expanded}>
+                <h1 className="text-center text-xl m-4">Comments</h1>
+                {(comments.length < 1) && <p className="text-center">No comments for this post yet.</p>}
+                {(comments.length > 0) && comments.map(comment => {
+                    return <CommentBox key={comment._id} username={comment.by.username} createdAt={comment.createdAt} text={comment.text}/>
+                })}
+            </Collapse>
+        </Card>
     )
 }
 
