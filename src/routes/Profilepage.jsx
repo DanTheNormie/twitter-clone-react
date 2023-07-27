@@ -1,29 +1,34 @@
 import { Button, TextField, OutlinedInput, InputAdornment, IconButton, FormControl, InputLabel, Icon} from "@mui/material"
 import EditIcon from '@mui/icons-material/Edit';
 import {Visibility,VisibilityOff} from '@mui/icons-material';
-import { useEffect, useState } from "react"
+import { useEffect, useState, forwardRef, useRef } from "react"
 import { useNavigate, useLocation } from "react-router-dom";
 import TweetBox from "../components/TweetBox";
+import MuiAlert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 
+const Alert = forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 function Profile(props){
     const [showPassword, setShowPassword] = useState(false);
     const handleClickShowPassword = () => setShowPassword((show) => !show);
-    const [disabled,setDisabled] = useState(true)
+    const [disabled,setDisabled] = useState(false)
     const [usernameHelper,setUsernameHelper] = useState('Username')
     const [ageHelper,setAgeHelper] = useState('Age')
     const {state} = useLocation()
     const token = localStorage.getItem('user_token')
     const [articlesList,setArticlesList] = useState([])
-
-    console.log(state);
+    const [open, setOpen] = useState(false)
+    let status_msg= useRef('')
+    let alert_style = useRef('')
 
     function loadUsersTweets(){
         const options = {headers:{Authorization:token}}
         return fetch(`https://twitter-clone-86ay.onrender.com/api/users/${state._id}/tweets`,options)
        .then(res => res.json())
        .then(json => {
-            console.log(json);
             const array = json.data
             setArticlesList(array)
        })
@@ -49,17 +54,46 @@ function Profile(props){
         })
 
         console.log(options);
-        let res = await fetch(`https://twitter-clone-86ay.onrender.com/api/users/${state._id}`, options)
-        res = await res.json()
-        console.log(res)
+        
+        fetch(`https://twitter-clone-86ay.onrender.com/api/users/${state._id}`, options)
+        .then(res => res.json())
+        .then(data=>{
+            if(data.success){
+                alert_style.current = 'success'
+                status_msg.current = 'updated user details successfully'
+            }else{
+                alert_style.current= 'error'
+                status_msg.current = 'Couldn\'t update user detials'
+            }
+            setOpen(true)
+            console.log(data);
+        }).catch((err)=>{
+            alert_style.current='error'
+            status_msg.current ='something went wrong :('
+            setOpen(true)
+            console.log(err);
+        })
+        
     }
 
     return(
         <div className="flex flex-col justify-center m-4" >
+
+        <Snackbar
+            anchorOrigin={{ vertical:'top', horizontal:'center' }}
+            open={open}
+            autoHideDuration={6000}
+            onClose={() => {setOpen(false);}}
+            key='Tweet status'>
+                <Alert onClose={() => {setOpen(false);}} severity={alert_style.current} sx={{ width: '100%' }}>
+                    {status_msg.current}
+                </Alert>
+        </Snackbar>
+
             <form className='flex flex-col justify-center items-center border w-full p-8 rounded-xl bg-slate-200'>
                 <div className="flex w-full justify-between items-center mb-4">
                     <h1 className="text-3xl  font-bold">User Details</h1>
-                    <IconButton disabled = {disabled} onClick={()=>{setDisabled(!disabled)}} className="ml-3"><EditIcon></EditIcon></IconButton>
+                    <IconButton onClick={()=>{setDisabled(!disabled)}} className="ml-3"><EditIcon></EditIcon></IconButton>
                 </div>
                 
                 <TextField className="w-full" id='email' disabled label='Email' value={state.email} type="email" variant="outlined" sx={{m:2}}></TextField>
